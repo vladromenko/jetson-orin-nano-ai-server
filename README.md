@@ -1,36 +1,44 @@
 # Jetson Orin Nano AI Server
 
-A local AI server built on **NVIDIA Jetson Orin Nano 8GB** using **Docker**, **Ollama**, and **Open WebUI**.
+A practical local AI server built on **NVIDIA Jetson Orin Nano 8GB** using **Docker**, **Ollama**, and **Open WebUI**.
 
-The goal of this project was to turn a small edge AI device into a practical local LLM server that can be accessed from a browser in the local network. This setup is also intended as a foundation for future robotics projects, local assistants, and Raspberry Pi / Hailo integrations.
+This project is my attempt to turn a small edge AI device into a usable local LLM server that can run on my own hardware and be accessed from a browser over the local network.
 
----
-
-## Overview
-
-This project documents the setup, testing, and current limitations of running local language models on Jetson Orin Nano 8GB.
-
-The system provides:
-
-- a local LLM backend with Ollama;
-- a browser-based chat interface with Open WebUI;
-- Docker-based deployment;
-- local network access from another computer;
-- SSD-based storage for heavier data;
-- practical notes about model sizes that work realistically on 8GB RAM.
+The project is not only about installing a web interface. The main goal was to understand how Jetson Orin Nano behaves as a real local AI machine: how to deploy the software, where the storage bottlenecks are, what model sizes are realistic, what breaks, and how this setup can later become part of a robotics stack.
 
 ---
 
-## Hardware
+## Why I Built This
+
+I wanted a local AI server that could be used as a base for:
+
+- local LLM experiments;
+- a private AI chatbot;
+- a robotics assistant backend;
+- future integration with Raspberry Pi + Hailo devices;
+- experiments with edge AI and small local models;
+- a portfolio project showing real hardware setup, not only code.
+
+Jetson Orin Nano is interesting because it is a compact edge AI device. It is small enough to be used in robotics projects, but powerful enough to run real AI workloads when the setup is chosen carefully.
+
+The important practical question was:
+
+> Can I make Jetson Orin Nano 8GB work as a stable local AI server with a browser interface?
+
+The answer is: yes, but with realistic expectations about memory, model size, storage, and runtime stability.
+
+---
+
+## What I Used
+
+### Hardware
 
 - NVIDIA Jetson Orin Nano 8GB
 - SSD / NVMe storage
 - Local network connection
-- Laptop for access via browser, SSH, and VS Code Remote SSH
+- MacBook / laptop for browser access, SSH, and VS Code Remote SSH
 
----
-
-## Software Stack
+### Software
 
 - Linux / JetPack on Jetson
 - Docker
@@ -40,30 +48,41 @@ The system provides:
 
 ---
 
-## Current Status
+## External Sources I Used
 
-Implemented:
+During this setup I used and compared information from several sources:
 
-- Docker is installed and working.
-- Open WebUI is running in Docker.
-- Open WebUI is accessible from the local network.
-- Ollama API was tested.
-- Basic local models were tested.
-- Practical model limits for Jetson Orin Nano 8GB were evaluated.
-- SSD storage is used for heavier data such as Docker volumes and model files.
+- NVIDIA Jetson Orin Nano Developer Kit documentation  
+  https://developer.nvidia.com/embedded/learn/get-started-jetson-orin-nano-devkit
 
-Planned improvements:
+- NVIDIA Jetson Orin Nano Developer Kit User Guide  
+  https://developer.nvidia.com/embedded/learn/jetson-orin-nano-devkit-user-guide
 
-- Add final model benchmarks.
-- Add screenshots.
-- Add a short demo video.
-- Add VPN / remote access.
-- Add monitoring for RAM, CPU, GPU, temperature, and storage.
-- Integrate the server with robotics projects.
+- NVIDIA Jetson Orin Nano product information  
+  https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/
+
+- Jetson AI Lab tutorials  
+  https://www.jetson-ai-lab.com/
+
+- Open WebUI documentation  
+  https://docs.openwebui.com/
+
+- Open WebUI GitHub repository  
+  https://github.com/open-webui/open-webui
+
+- Ollama documentation  
+  https://docs.ollama.com/
+
+- Ollama API documentation  
+  https://docs.ollama.com/api
+
+These sources helped me understand the expected architecture: Jetson as an edge AI device, Ollama as the local model runtime, Open WebUI as the browser interface, and Docker as the deployment layer.
 
 ---
 
-## Architecture
+## Project Overview
+
+The final idea is simple:
 
 ```text
 Laptop / Browser
@@ -80,109 +99,69 @@ Open WebUI  --->  Ollama  --->  Local LLM Models
 SSD Storage
 ```
 
-Open WebUI provides the browser interface. Ollama runs the local language models. Docker is used to deploy Open WebUI. SSD storage is used to avoid filling the main system storage with containers, volumes, and model files.
+Open WebUI provides the browser interface.  
+Ollama runs local language models.  
+Docker is used to deploy Open WebUI.  
+SSD storage is used to avoid filling the main system storage with containers, volumes, and model files.
 
 ---
 
-## Basic System Checks
+## What I Actually Did
 
-Check system information:
+### 1. Checked the Jetson system
+
+I first checked the operating system, kernel, memory, and storage.
+
+Useful commands:
 
 ```bash
 uname -a
 cat /etc/os-release
-```
-
-Check memory:
-
-```bash
 free -h
-```
-
-Check storage:
-
-```bash
 df -h
 lsblk
 ```
 
-These commands help confirm the system version, available RAM, mounted drives, and SSD usage.
+This helped confirm the system state and whether the SSD was visible and mounted.
 
 ---
 
-## Docker Checks
+### 2. Set up Docker
 
-Check Docker version:
+Docker was used because Open WebUI is easy to run and maintain as a container.
+
+Useful checks:
 
 ```bash
 docker --version
-```
-
-Check running containers:
-
-```bash
 docker ps
-```
-
-Check all containers:
-
-```bash
 docker ps -a
-```
-
-Check Docker storage location and runtime:
-
-```bash
 docker info | grep -E "Docker Root Dir|Default Runtime|Runtimes"
 ```
 
-This is useful for confirming that Docker is working and that heavy Docker data can be stored on SSD.
+One of the important points was storage. AI-related containers and model files can grow quickly, so I wanted heavy data to be stored on SSD instead of filling the main system storage.
 
 ---
 
-## Ollama Check
+### 3. Set up Ollama
 
-Check whether the Ollama API responds:
+Ollama was used as the local LLM backend.
+
+The basic API check:
 
 ```bash
 curl http://127.0.0.1:11434/api/tags
 ```
 
-This command returns the list of locally available Ollama models.
-
-Example purpose:
-
-```text
-Confirm that Ollama is running and that local models are available.
-```
+This command returns locally available models and confirms that Ollama is running.
 
 ---
 
-## Open WebUI Check
+### 4. Ran Open WebUI
 
-Check Open WebUI from the Jetson itself:
+Open WebUI was used as the browser-based interface for the local LLM server.
 
-```bash
-curl -I http://127.0.0.1:8080
-```
-
-Access Open WebUI from another device in the same local network:
-
-```text
-http://JETSON_IP:8080
-```
-
-Example:
-
-```text
-http://192.168.1.19:8080
-```
-
----
-
-## Open WebUI Docker Command
-
-Example command used to run Open WebUI:
+Example Docker command:
 
 ```bash
 docker run -d \
@@ -194,7 +173,7 @@ docker run -d \
   ghcr.io/open-webui/open-webui:main
 ```
 
-Explanation:
+Why these options are useful:
 
 - `--network=host` allows Open WebUI to use the Jetson network directly.
 - `--restart always` makes the container restart automatically.
@@ -203,45 +182,60 @@ Explanation:
 
 ---
 
-## Useful Docker Commands
+### 5. Tested local network access
 
-Check running containers:
-
-```bash
-docker ps
-```
-
-View Open WebUI logs:
+From the Jetson itself:
 
 ```bash
-docker logs open-webui
+curl -I http://127.0.0.1:8080
 ```
 
-Restart Open WebUI:
+From another device in the same network:
 
-```bash
-docker restart open-webui
+```text
+http://JETSON_IP:8080
 ```
 
-Stop Open WebUI:
+Example:
 
-```bash
-docker stop open-webui
+```text
+http://192.168.1.19:8080
 ```
 
-Remove Open WebUI container:
+This made it possible to use Jetson as a small local AI server from a laptop browser.
 
-```bash
-docker rm open-webui
-```
+---
+
+## Current Status
+
+Implemented:
+
+- Docker is installed and working.
+- Open WebUI is running in Docker.
+- Open WebUI is accessible from the local network.
+- Ollama API was tested.
+- Basic local models were tested.
+- SSD storage is used for heavier data such as Docker volumes and model files.
+- Practical model limits for Jetson Orin Nano 8GB were evaluated.
+
+Not finished yet:
+
+- Final benchmark table.
+- Screenshots.
+- Demo video.
+- VPN / remote access.
+- Monitoring scripts.
+- Robotics integration examples.
 
 ---
 
 ## Model Testing Notes
 
-Jetson Orin Nano 8GB has limited memory for large language models. Because of this, model size and quantization matter a lot.
+The most important practical lesson: **Jetson Orin Nano 8GB is useful, but model size matters a lot.**
 
-Practical observations:
+This device is not a desktop GPU workstation. It is an edge AI device with limited memory, so large LLMs can fail or become unstable.
+
+### Practical observations
 
 | Model Size | Result |
 |---|---|
@@ -257,9 +251,57 @@ cudaMalloc failed: out of memory
 llama runner process has terminated
 ```
 
-Practical conclusion:
+### Conclusion
 
-For Jetson Orin Nano 8GB, smaller models are usually better for stability. The most realistic range is around **1B–4B parameters**, depending on the exact model, quantization, and runtime configuration.
+For Jetson Orin Nano 8GB, smaller models are usually better for stability.
+
+The most realistic range is around **1B–4B parameters**, depending on:
+
+- the exact model;
+- quantization;
+- memory usage;
+- runtime configuration;
+- whether other services are running at the same time.
+
+For this setup, stability is more important than chasing the largest possible model.
+
+---
+
+## Useful Commands
+
+### System
+
+```bash
+uname -a
+cat /etc/os-release
+free -h
+df -h
+lsblk
+```
+
+### Docker
+
+```bash
+docker --version
+docker ps
+docker ps -a
+docker info | grep -E "Docker Root Dir|Default Runtime|Runtimes"
+```
+
+### Ollama
+
+```bash
+curl http://127.0.0.1:11434/api/tags
+```
+
+### Open WebUI
+
+```bash
+curl -I http://127.0.0.1:8080
+docker ps
+docker logs open-webui
+docker restart open-webui
+```
 
 ---
 
@@ -330,7 +372,20 @@ On Jetson Orin Nano 8GB, 7B models are often not practical. Smaller models are m
 
 ---
 
-## Use Cases
+## What I Learned
+
+This project helped me understand several practical things:
+
+- Running local AI on edge hardware is possible, but the setup must be realistic.
+- Storage planning matters because Docker data and model files can become large.
+- A web interface like Open WebUI makes local models much easier to use.
+- Ollama provides a simple local API for model management and testing.
+- Jetson Orin Nano 8GB is better suited for smaller efficient models than for large LLMs.
+- For robotics projects, a stable small model can be more useful than a large unstable one.
+
+---
+
+## Possible Use Cases
 
 This setup can be used for:
 
@@ -340,19 +395,10 @@ This setup can be used for:
 - local coding assistant experiments;
 - offline AI testing;
 - edge AI portfolio project;
-- future integration with Raspberry Pi + Hailo devices.
+- future integration with Raspberry Pi + Hailo devices;
+- local AI interface for robots or smart devices.
 
 ---
-
-## Future Improvements
-
-- Add screenshots of Open WebUI and terminal checks.
-- Add model benchmark results.
-- Add demo video.
-- Add VPN access for remote usage.
-- Add monitoring scripts.
-- Add integration examples with robotics platforms.
-- Add automatic startup validation.
 
 ---
 
@@ -360,7 +406,16 @@ This setup can be used for:
 
 This project shows how a compact edge AI device can be configured as a practical local AI server.
 
-It is not just a simple web interface installation. The project includes hardware setup, Docker deployment, local model testing, SSD storage planning, network access, and real-world limitations of running LLMs on embedded AI hardware.
+The value of the project is not just that Open WebUI was installed. The value is in the full process:
 
-The main value of this project is that it creates a reusable base for future AI and robotics experiments.
+- preparing the hardware;
+- checking the operating system;
+- configuring Docker;
+- connecting Open WebUI to Ollama;
+- moving heavy data to SSD;
+- testing local models;
+- finding realistic model limits;
+- documenting what works and what does not.
+
+This creates a reusable base for future AI and robotics experiments.
 
