@@ -218,15 +218,6 @@ Implemented:
 - SSD storage is used for heavier data such as Docker volumes and model files.
 - Practical model limits for Jetson Orin Nano 8GB were evaluated.
 
-Not finished yet:
-
-- Final benchmark table.
-- Screenshots.
-- Demo video.
-- VPN / remote access.
-- Monitoring scripts.
-- Robotics integration examples.
-
 ---
 
 ## Model Testing Notes
