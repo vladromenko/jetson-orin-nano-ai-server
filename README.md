@@ -1,5 +1,7 @@
 # Jetson Orin Nano AI Server
 
+![alt text](Photo.jpeg)
+
 A practical local AI server built on **NVIDIA Jetson Orin Nano 8GB** using **Docker**, **Ollama**, and **Open WebUI**.
 
 This project is my attempt to turn a small edge AI device into a usable local LLM server that can run on my own hardware and be accessed from a browser over the local network.
@@ -124,6 +126,12 @@ lsblk
 
 This helped confirm the system state and whether the SSD was visible and mounted.
 
+Example system check:
+![alt text](Screenshots/01-system-info.png)
+
+SSD / NVMe storage check:
+![alt text](Screenshots/02-storage-ssd.png)
+
 ---
 
 ### 2. Set up Docker
@@ -141,6 +149,9 @@ docker info | grep -E "Docker Root Dir|Default Runtime|Runtimes"
 
 One of the important points was storage. AI-related containers and model files can grow quickly, so I wanted heavy data to be stored on SSD instead of filling the main system storage.
 
+Docker status and runtime check:
+![alt text](Screenshots/03-docker-status.png)
+
 ---
 
 ### 3. Set up Ollama
@@ -155,9 +166,18 @@ curl http://127.0.0.1:11434/api/tags
 
 This command returns locally available models and confirms that Ollama is running.
 
+Ollama local API test:
+![alt text](Screenshots/04_2-ollama-api.png) 
+
+![alt text](Screenshots/04_1-ollama-api.png)
+
 ---
 
 ### 4. Ran Open WebUI
+
+Open WebUI running as a Docker container:
+
+![alt text](Screenshots/05-open-webui-container.png.png)
 
 Open WebUI was used as the browser-based interface for the local LLM server.
 
@@ -204,6 +224,11 @@ http://192.168.1.19:8080
 
 This made it possible to use Jetson as a small local AI server from a laptop browser.
 
+Open WebUI accessible from another device in the local network:
+
+![alt text](Screenshots/06_1-open-webui-browser.png.png)
+
+![alt text](Screenshots/06_2-open-webui-browser.png.png)
 ---
 
 ## Current Status
